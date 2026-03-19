@@ -247,18 +247,43 @@ def detect_subscriptions(user_id, months_back=3):
         Expense.user_id == user_id,
         Expense.date >= since_date
     ).all()
-    
+
     groups = defaultdict(list)
     for exp in expenses:
         key = (exp.category.strip().lower(), exp.description.strip().lower() if exp.description else '')
         groups[key].append(exp)
-    
+
+    seen_keys = set()
     subscriptions = []
+
+    # First: include any expense explicitly marked as a subscription
+    for exp in expenses:
+        if exp.is_subscription:
+            key = (exp.category.strip().lower(), exp.description.strip().lower() if exp.description else '')
+            if key not in seen_keys:
+                seen_keys.add(key)
+                items = groups[key]
+                amounts = [i.amount for i in items]
+                avg_amount = sum(amounts) / len(amounts)
+                subscriptions.append({
+                    'category': exp.category.strip(),
+                    'description': exp.description or 'No description',
+                    'avg_amount': avg_amount,
+                    'frequency': len(items),
+                    'last_date': max(i.date for i in items),
+                    'expenses': items
+                })
+
+    # Second: auto-detect by repeated pattern (same category+description, 2+ times, similar amount)
     for (cat, desc), items in groups.items():
+        key = (cat, desc)
+        if key in seen_keys:
+            continue
         if len(items) >= 2:
             amounts = [i.amount for i in items]
-            avg_amount = sum(amounts)/len(amounts)
-            if all(abs(a - avg_amount) <= avg_amount*0.1 for a in amounts):
+            avg_amount = sum(amounts) / len(amounts)
+            if all(abs(a - avg_amount) <= avg_amount * 0.1 for a in amounts):
+                seen_keys.add(key)
                 subscriptions.append({
                     'category': cat,
                     'description': desc or 'No description',
@@ -267,6 +292,7 @@ def detect_subscriptions(user_id, months_back=3):
                     'last_date': max(i.date for i in items),
                     'expenses': items
                 })
+
     return subscriptions
 
 # Helper: get spending reduction suggestions
