@@ -10,7 +10,7 @@ app = Flask(__name__)
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 
-admin = Admin(app, name='Finance Manager', template_mode='bootstrap3')
+admin = Admin(app, name='Finance Manager')
 app.config['SECRET_KEY'] = 'your-secret-key-change-in-production'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///finance.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -735,4 +735,4 @@ def analysis():
     return render_template('analysis.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
