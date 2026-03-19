@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('goals') }}" class="btn btn-outline-light">← Back to Goals</a>
+</div>
+
+<div class="row">
+    <!-- Goal Details -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">{{ goal.name }}</h4>
+            </div>
+            <div class="card-body">
+                <!-- Progress -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <h5>Progress</h5>
+                        <h5>{{ "%.1f"|format(goal.progress_percentage) }}%</h5>
+                    </div>
+                    <div class="progress" style="height: 30px;">
+                        <div class="progress-bar bg-success" 
+                             style="width: {{ goal.progress_percentage }}%;"
+                             role="progressbar">
+                            ₹{{ "%.0f"|format(goal.saved_amount) }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats Grid -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6">
+                        <div class="bg-light p-3 rounded">
+                            <small class="text-muted">Target Amount</small>
+                            <h4 class="mb-0">₹{{ "%.0f"|format(goal.target_amount) }}</h4>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="bg-light p-3 rounded">
+                            <small class="text-muted">Saved So Far</small>
+                            <h4 class="mb-0">₹{{ "%.0f"|format(goal.saved_amount) }}</h4>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="bg-light p-3 rounded">
+                            <small class="text-muted">Remaining</small>
+                            <h4 class="mb-0 text-warning">₹{{ "%.0f"|format(goal.remaining_amount) }}</h4>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="bg-light p-3 rounded">
+                            <small class="text-muted">Monthly Savings</small>
+                            <h4 class="mb-0">₹{{ "%.0f"|format(goal.monthly_savings) }}</h4>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Timeline -->
+                <div class="alert alert-info">
+                    <h6 class="alert-heading"> Estimated Timeline</h6>
+                    {% if goal.monthly_savings > 0 %}
+                        <p class="mb-1">
+                            <strong>{{ "%.1f"|format(goal.estimated_months) }} months</strong>
+                            {% if goal.estimated_date %}
+                                ({{ goal.estimated_date.strftime('%d %b %Y') }})
+                            {% endif %}
+                        </p>
+                        {% if goal.target_date and goal.estimated_date %}
+                            {% if goal.estimated_date <= goal.target_date %}
+                                <p class="text-success mb-0">✓ On track to meet target date</p>
+                            {% else %}
+                                <p class="text-warning mb-0">⚠ May miss target date</p>
+                            {% endif %}
+                        {% endif %}
+                    {% else %}
+                        <p class="mb-0">Set monthly savings to see timeline</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Current Savings Display -->
+<div class="bg-light p-3 rounded mb-3">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <small class="text-muted">Current Savings</small>
+            <h3 class="mb-0">₹{{ "%.0f"|format(goal.saved_amount) }}</h3>
+        </div>
+        <div class="text-end">
+            <small class="text-muted">Target</small>
+            <h4 class="mb-0">₹{{ "%.0f"|format(goal.target_amount) }}</h4>
+        </div>
+    </div>
+</div>
+
+<!-- Update Savings Form - Now with Add button -->
+<form method="POST" class="mt-3">
+    {{ form.hidden_tag() }}
+    <div class="input-group">
+        <span class="input-group-text">₹</span>
+        {{ form.saved_amount(class="form-control", placeholder="Enter amount to add", step="0.01", min="0") }}
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Add to Savings
+        </button>
+    </div>
+    <small class="text-muted">This amount will be added to your current savings of ₹{{ "%.0f"|format(goal.saved_amount) }}</small>
+</form>
+
+<!-- Quick Add Buttons (Optional Enhancement) -->
+<div class="mt-2 d-flex gap-2">
+    <button type="button" class="btn btn-sm btn-outline-primary quick-add" data-amount="500">+₹500</button>
+    <button type="button" class="btn btn-sm btn-outline-primary quick-add" data-amount="1000">+₹1,000</button>
+    <button type="button" class="btn btn-sm btn-outline-primary quick-add" data-amount="2000">+₹2,000</button>
+    <button type="button" class="btn btn-sm btn-outline-primary quick-add" data-amount="5000">+₹5,000</button>
+</div>
+
+<script>
+// Quick add buttons functionality
+document.querySelectorAll('.quick-add').forEach(button => {
+    button.addEventListener('click', function() {
+        const amount = this.dataset.amount;
+        document.getElementById('saved_amount').value = amount;
+    });
+});
+</script>
+            </div>
+        </div>
+    </div>
+    
+    <!-- What-If Simulator -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"> What-If Simulator</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Adjust Monthly Savings (₹)</label>
+                    <input type="range" class="form-range" id="monthlySlider" 
+                           min="0" max="{{ goal.monthly_savings * 3 }}" 
+                           value="{{ goal.monthly_savings }}" step="100">
+                    <div class="d-flex justify-content-between">
+                        <span>₹<span id="monthlyValue">{{ "%.0f"|format(goal.monthly_savings) }}</span></span>
+                        <span class="text-muted">Current: ₹{{ "%.0f"|format(goal.monthly_savings) }}</span>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Additional Spending Reduction (₹)</label>
+                    <input type="range" class="form-range" id="reductionSlider" 
+                           min="0" max="10000" value="0" step="100">
+                    <div class="d-flex justify-content-between">
+                        <span>₹<span id="reductionValue">0</span></span>
+                        <span class="text-muted">From wants reduction</span>
+                    </div>
+                </div>
+                
+                <!-- Simulator Results -->
+                <div class="bg-light p-3 rounded mb-3">
+                    <h6>New Timeline</h6>
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="mb-1">Original:</p>
+                            <p class="mb-0">Current:</p>
+                            <p class="mb-0"><strong>With changes:</strong></p>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-1">
+                                {% if goal.monthly_savings > 0 %}
+                                    {{ "%.1f"|format(goal.estimated_months) }} months
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </p>
+                            <p class="mb-0">
+                                {% if goal.monthly_savings > 0 %}
+                                    {{ "%.1f"|format(goal.estimated_months) }} months
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </p>
+                            <p class="mb-0" id="newTime">--</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-success" id="savingsAlert" style="display: none;">
+                     You'll save <span id="timeSaved"></span> months!
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Spending Reduction Suggestions -->
+{% if suggestions %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"> Spending Reduction Suggestions</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {% for suggestion in suggestions %}
+            <div class="col-md-6 mb-3">
+                <div class="bg-light p-3 rounded">
+                    <h6>{{ suggestion.category }}</h6>
+                    <p class="mb-2">Current: ₹{{ "%.0f"|format(suggestion.current_spending) }}/month</p>
+                    <p class="mb-2 text-success">
+                        Reduce by ₹{{ "%.0f"|format(suggestion.suggested_reduction) }}/month
+                    </p>
+                    <p class="mb-0">
+                        <strong>Save {{ "%.1f"|format(suggestion.months_saved) }} months!</strong>
+                    </p>
+                    <button class="btn btn-sm btn-outline-primary mt-2 apply-suggestion"
+                            data-reduction="{{ suggestion.suggested_reduction }}">
+                        Apply to Simulator
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Milestone Timeline -->
+{% if milestones %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"> Monthly Milestones</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Date</th>
+                        <th>Projected Savings</th>
+                        <th>Progress</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for milestone in milestones %}
+                    <tr>
+                        <td>{{ milestone.month }}</td>
+                        <td>{{ milestone.date.strftime('%d %b %Y') }}</td>
+                        <td>₹{{ "%.0f"|format(milestone.amount) }}</td>
+                        <td>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-info" 
+                                     style="width: {{ (milestone.amount / goal.target_amount) * 100 }}%;">
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script>
+const monthlySlider = document.getElementById('monthlySlider');
+const reductionSlider = document.getElementById('reductionSlider');
+const monthlyValue = document.getElementById('monthlyValue');
+const reductionValue = document.getElementById('reductionValue');
+const newTime = document.getElementById('newTime');
+const savingsAlert = document.getElementById('savingsAlert');
+const timeSaved = document.getElementById('timeSaved');
+
+function updateSimulator() {
+    const monthly = parseFloat(monthlySlider.value) || 0;
+    const reduction = parseFloat(reductionSlider.value) || 0;
+    
+    monthlyValue.textContent = monthly.toFixed(0);
+    reductionValue.textContent = reduction.toFixed(0);
+    
+    fetch('{{ url_for("what_if", id=goal.id) }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            monthly_savings: monthly,
+            spending_reduction: reduction
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.months && data.months !== Infinity) {
+            newTime.textContent = data.months + ' months (' + data.date + ')';
+            
+            {% if goal.monthly_savings > 0 %}
+            const originalMonths = {{ goal.estimated_months }};
+            if (data.months < originalMonths) {
+                const saved = (originalMonths - data.months).toFixed(1);
+                timeSaved.textContent = saved;
+                savingsAlert.style.display = 'block';
+            } else {
+                savingsAlert.style.display = 'none';
+            }
+            {% else %}
+            savingsAlert.style.display = 'none';
+            {% endif %}
+        } else {
+            newTime.textContent = '--';
+            savingsAlert.style.display = 'none';
+        }
+    });
+}
+
+monthlySlider.addEventListener('input', updateSimulator);
+reductionSlider.addEventListener('input', updateSimulator);
+
+// Apply suggestion buttons
+document.querySelectorAll('.apply-suggestion').forEach(button => {
+    button.addEventListener('click', function() {
+        const reduction = parseFloat(this.dataset.reduction);
+        reductionSlider.value = reduction;
+        updateSimulator();
+    });
+});
+
+// Initial update
+updateSimulator();
+</script>
+{% endblock %}

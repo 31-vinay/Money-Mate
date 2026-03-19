@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Detected Subscriptions</h2>
+{% if subscriptions %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Avg. Monthly Amount</th>
+                <th>Occurrences</th>
+                <th>Last Date</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for sub in subscriptions %}
+            <tr>
+                <td>{{ sub.category }}</td>
+                <td>{{ sub.description }}</td>
+                <td>${{ "%.2f"|format(sub.avg_amount) }}</td>
+                <td>{{ sub.frequency }} times</td>
+                <td>{{ sub.last_date.strftime('%Y-%m-%d') }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <p><strong>Total monthly subscription cost: ${{ "%.2f"|format(total_cost) }}</strong></p>
+    <div class="alert alert-info">
+        💡 Tip: Review these recurring expenses. Canceling even small subscriptions can add up to significant savings.
+    </div>
+{% else %}
+    <p>No recurring subscriptions detected in the last 3 months.</p>
+{% endif %}
+{% endblock %}

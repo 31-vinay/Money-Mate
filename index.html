@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+.hero{
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color:white;
+    padding:100px 20px;
+    border-radius:15px;
+    text-align:center;
+    margin-top:20px;
+}
+
+.hero h1{
+    font-size:48px;
+    font-weight:700;
+}
+
+.hero p{
+    font-size:20px;
+    margin-top:15px;
+}
+
+.btn-custom{
+    padding:12px 30px;
+    font-size:18px;
+    border-radius:30px;
+}
+
+.features{
+    margin-top:60px;
+}
+
+.feature-card{
+    border:none;
+    border-radius:15px;
+    padding:30px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.1);
+    transition:0.3s;
+}
+
+.feature-card:hover{
+    transform:translateY(-10px);
+}
+
+</style>
+
+<div class="container">
+
+
+<!-- Hero Section -->
+<div class="hero">
+
+    <h1> MONEY MATE </h1>
+
+    <p>Track your income, control expenses and improve your financial health.</p>
+
+    {% if not current_user.is_authenticated %}
+
+   
+ <div class="mt-4">
+    <a href="{{ url_for('login') }}" class="btn btn-light btn-custom me-3">Login</a>
+    <a href="{{ url_for('register') }}" class="btn btn-light btn-custom">Register</a>
+</div>
+  
+
+    {% else %}
+
+    <div class="mt-4">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-success btn-custom">
+            Go to Dashboard
+        </a>
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- Features Section -->
+<div class="row features text-center">
+
+    <div class="col-md-4 mt-4">
+        <div class="card feature-card">
+            <h3> Expense Tracking</h3>
+            <p>Monitor all your daily expenses and stay within your monthly budget.</p>
+        </div>
+    </div>
+
+    <div class="col-md-4 mt-4">
+        <div class="card feature-card">
+            <h3> Financial Insights </h3>
+            <p>Visual reports and insights to help you make smarter financial decisions.</p>
+        </div>
+    </div>
+
+    <div class="col-md-4 mt-4">
+        <div class="card feature-card">
+            <h3> Secure Data </h3>
+            <p>Your financial data is stored securely and accessible anytime.</p>
+        </div>
+    </div>
+
+</div>
+```
+
+</div>
+
+{% endblock %}

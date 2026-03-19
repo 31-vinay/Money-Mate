@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+.login-container{
+    min-height:80vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.login-card{
+    width:100%;
+    max-width:420px;
+    border:none;
+    border-radius:18px;
+    padding:35px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.15);
+}
+
+.login-title{
+    font-weight:600;
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.form-control{
+    border-radius:10px;
+}
+
+.btn-login{
+    width:100%;
+    border-radius:25px;
+    padding:10px;
+    font-weight:500;
+}
+
+.login-icon{
+    font-size:40px;
+    text-align:center;
+    margin-bottom:10px;
+}
+
+</style>
+
+<div class="login-container">
+
+<div class="card login-card">
+
+<h3 class="login-title">Welcome Back</h3>
+
+<form method="POST">
+
+{{ form.hidden_tag() }}
+
+<div class="mb-3">
+{{ form.username.label(class="form-label") }}
+<div class="input-group">
+<span class="input-group-text"><i class="bi bi-person"></i></span>
+{{ form.username(class="form-control", placeholder="Enter username") }}
+</div>
+</div>
+
+<div class="mb-3">
+{{ form.password.label(class="form-label") }}
+<div class="input-group">
+<span class="input-group-text"><i class="bi bi-lock"></i></span>
+{{ form.password(class="form-control", placeholder="Enter password") }}
+</div>
+</div>
+
+<button type="submit" class="btn btn-primary btn-login">
+<i class="bi bi-box-arrow-in-right"></i> Login
+</button>
+
+</form>
+
+<div class="text-center mt-3">
+
+<p class="mb-1">Don't have an account?</p>
+
+<a href="{{ url_for('register') }}" class="text-decoration-none fw-bold">
+Create Account
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}
