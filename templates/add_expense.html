@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="row justify-content-center">
-  <div class="col-md-8 col-lg-7">
+<div class="row g-4">
+
+  <!-- Add / Edit Form -->
+  <div class="col-lg-5">
     <div class="card fade-in">
       <div class="card-header">
         <i class="bi bi-{% if edit %}pencil{% else %}wallet2{% endif %}"></i>
@@ -73,6 +75,73 @@
       </div>
     </div>
   </div>
+
+  <!-- Expenses List -->
+  <div class="col-lg-7 fade-in fade-in-delay-1">
+    <div class="card">
+      <div class="card-header d-flex align-items-center gap-2">
+        <i class="bi bi-list-ul"></i> All Expenses
+        <span class="badge ms-auto" style="background:rgba(255,255,255,0.25);">{{ expenses|length }} entries</span>
+      </div>
+      <div class="card-body p-0">
+        {% if expenses %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for exp in expenses %}
+            <tr>
+              <td style="font-size:0.88rem;">
+                {% if 'rent' in exp.category.lower() or 'mortgage' in exp.category.lower() %}🏠
+                {% elif 'food' in exp.category.lower() or 'groceries' in exp.category.lower() %}🍔
+                {% elif 'transport' in exp.category.lower() %}🚗
+                {% elif 'health' in exp.category.lower() %}🏥
+                {% elif 'entertainment' in exp.category.lower() %}🎮
+                {% else %}📌{% endif %}
+                {{ exp.category }}
+                {% if exp.is_subscription %}<i class="bi bi-arrow-repeat text-info ms-1" title="Subscription"></i>{% endif %}
+              </td>
+              <td><strong class="text-danger">₹{{ "%.2f"|format(exp.amount) }}</strong></td>
+              <td style="font-size:0.82rem;color:var(--text-muted);">{{ exp.date.strftime('%d %b %Y') }}</td>
+              <td>
+                <span class="badge {% if exp.is_essential %}bg-success{% else %}bg-warning{% endif %}">
+                  {% if exp.is_essential %}Need{% else %}Want{% endif %}
+                </span>
+              </td>
+              <td>
+                <div class="d-flex gap-1">
+                  <a href="{{ url_for('edit_expense', id=exp.id) }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <a href="{{ url_for('delete_expense', id=exp.id) }}" class="btn btn-danger btn-sm"
+                     onclick="return confirm('Delete this expense?')">
+                    <i class="bi bi-trash"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+          <i class="bi bi-wallet2" style="font-size:2.5rem;opacity:0.3;"></i>
+          <p class="mt-2 mb-0">No expenses yet. Add your first one!</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>

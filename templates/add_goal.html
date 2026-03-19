@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="row justify-content-center">
-  <div class="col-md-8 col-lg-7">
+<div class="row g-4">
+
+  <!-- Create Goal Form -->
+  <div class="col-lg-5">
     <div class="card fade-in">
       <div class="card-header"><i class="bi bi-bullseye"></i> Create New Goal</div>
       <div class="card-body p-4">
@@ -34,7 +36,7 @@
                 <span class="input-group-text"><i class="bi bi-currency-rupee"></i></span>
                 {{ form.monthly_savings(class="form-control", type="number", step="0.01", placeholder="2000", id="monthly_savings") }}
               </div>
-              <small class="text-muted">How much can you save each month?</small>
+              <small class="text-muted">How much can you save monthly?</small>
               {% if form.monthly_savings.errors %}
                 {% for err in form.monthly_savings.errors %}<small class="text-danger d-block mt-1">{{ err }}</small>{% endfor %}
               {% endif %}
@@ -44,7 +46,7 @@
           <div class="mb-3">
             {{ form.target_date.label(class="form-label") }}
             {{ form.target_date(class="form-control", type="date") }}
-            <small class="text-muted">Optional: When would you like to reach this goal?</small>
+            <small class="text-muted">Optional: target completion date</small>
           </div>
 
           <!-- Live Calculator -->
@@ -61,13 +63,63 @@
               <i class="bi bi-check-circle me-2"></i>Create Goal
             </button>
             <a href="{{ url_for('goals') }}" class="btn btn-outline-secondary">
-              <i class="bi bi-arrow-left me-1"></i>Cancel
+              <i class="bi bi-arrow-left me-1"></i>Back to Goals
             </a>
           </div>
         </form>
       </div>
     </div>
   </div>
+
+  <!-- Goals List -->
+  <div class="col-lg-7 fade-in fade-in-delay-1">
+    <div class="card">
+      <div class="card-header d-flex align-items-center gap-2">
+        <i class="bi bi-list-ul"></i> Your Goals
+        <span class="badge ms-auto" style="background:rgba(255,255,255,0.25);">{{ goals|length }} goals</span>
+      </div>
+      <div class="card-body p-0">
+        {% if goals %}
+        {% for goal in goals %}
+        <div class="p-3 {% if not loop.last %}border-bottom{% endif %}" style="border-color:var(--border-color)!important;">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <div class="fw-700" style="font-size:0.95rem;">{{ goal.name }}</div>
+              <div style="font-size:0.82rem;color:var(--text-muted);">
+                ₹{{ "%.0f"|format(goal.saved_amount) }} of ₹{{ "%.0f"|format(goal.target_amount) }}
+                &nbsp;·&nbsp;
+                {% if goal.monthly_savings > 0 %}{{ "%.1f"|format(goal.estimated_months) }} months to go{% else %}No monthly savings set{% endif %}
+              </div>
+            </div>
+            <div class="d-flex gap-1">
+              <a href="{{ url_for('goal_detail', id=goal.id) }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="{{ url_for('delete_goal', id=goal.id) }}" class="btn btn-danger btn-sm"
+                 onclick="return confirm('Delete this goal?')">
+                <i class="bi bi-trash"></i>
+              </a>
+            </div>
+          </div>
+          <div class="progress" style="height:8px;">
+            <div class="progress-bar bg-success" style="width:{{ goal.progress_percentage }}%;"></div>
+          </div>
+          <div class="d-flex justify-content-between mt-1" style="font-size:0.75rem;color:var(--text-muted);">
+            <span>{{ "%.1f"|format(goal.progress_percentage) }}% complete</span>
+            {% if goal.target_date %}<span>Target: {{ goal.target_date.strftime('%d %b %Y') }}</span>{% endif %}
+          </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="text-center py-5 text-muted">
+          <i class="bi bi-bullseye" style="font-size:2.5rem;opacity:0.3;"></i>
+          <p class="mt-2 mb-0">No goals yet. Create your first one!</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>

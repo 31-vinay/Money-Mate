@@ -476,7 +476,8 @@ def add_income():
         db.session.commit()
         flash('Income added successfully!', 'success')
         return redirect(url_for('dashboard'))
-    return render_template('add_income.html', form=form, edit=False)
+    incomes = Income.query.filter_by(user_id=current_user.id).order_by(Income.date_received.desc()).all()
+    return render_template('add_income.html', form=form, edit=False, incomes=incomes)
 
 @app.route('/edit_income/<int:id>', methods=['GET','POST'])
 @login_required
@@ -566,8 +567,9 @@ def add_expense():
             flash('Please check the form and try again.', 'danger')
     else:
         form.sub_category.choices = [('', '-- Select Sub Category First --')]
-    
-    return render_template('add_expense.html', form=form, edit=False)
+
+    expenses = Expense.query.filter_by(user_id=current_user.id).order_by(Expense.date.desc()).all()
+    return render_template('add_expense.html', form=form, edit=False, expenses=expenses)
 
 @app.route('/edit_expense/<int:id>', methods=['GET','POST'])
 @login_required
@@ -671,7 +673,8 @@ def add_goal():
         db.session.commit()
         flash('Goal created successfully!', 'success')
         return redirect(url_for('goals'))
-    return render_template('add_goal.html', form=form)
+    goals = Goal.query.filter_by(user_id=current_user.id).order_by(Goal.created_at.desc()).all()
+    return render_template('add_goal.html', form=form, goals=goals)
 
 @app.route('/goal/<int:id>', methods=['GET','POST'])
 @login_required
