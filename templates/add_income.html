@@ -1,22 +1,47 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>{% if edit %}Edit Income{% else %}Add Income{% endif %}</h2>
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <div class="mb-3">
-        {{ form.source.label(class="form-label") }}
-        {{ form.source(class="form-select") }}
+
+<div class="row justify-content-center">
+  <div class="col-md-7 col-lg-6">
+    <div class="card fade-in">
+      <div class="card-header">
+        <i class="bi bi-{% if edit %}pencil{% else %}cash-coin{% endif %}"></i>
+        {% if edit %}Edit Income{% else %}Add Income{% endif %}
+      </div>
+      <div class="card-body p-4">
+        <form method="POST">
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.source.label(class="form-label") }}
+            {{ form.source(class="form-select") }}
+          </div>
+          <div class="mb-3">
+            {{ form.amount.label(class="form-label") }}
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-currency-rupee"></i></span>
+              {{ form.amount(class="form-control", placeholder="0.00", step="0.01") }}
+            </div>
+            {% if form.amount.errors %}
+              {% for err in form.amount.errors %}<small class="text-danger d-block mt-1">{{ err }}</small>{% endfor %}
+            {% endif %}
+          </div>
+          <div class="mb-4">
+            {{ form.description.label(class="form-label") }}
+            {{ form.description(class="form-control", placeholder="Optional note...") }}
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-success btn-lg">
+              <i class="bi bi-check-circle me-2"></i>
+              {% if edit %}Update Income{% else %}Add Income{% endif %}
+            </button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left me-1"></i>Cancel
+            </a>
+          </div>
+        </form>
+      </div>
     </div>
-    <div class="mb-3">
-        {{ form.amount.label(class="form-label") }}
-        {{ form.amount(class="form-control") }}
-    </div>
-    <div class="mb-3">
-        {{ form.description.label(class="form-label") }}
-        {{ form.description(class="form-control") }}
-    </div>
-    <button type="submit" class="btn btn-success">
-        {% if edit %}Update Income{% else %}Add Income{% endif %}
-    </button>
-</form>
+  </div>
+</div>
+
 {% endblock %}

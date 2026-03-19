@@ -1,34 +1,88 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Detected Subscriptions</h2>
+
+<div class="d-flex align-items-center justify-content-between mb-4 fade-in">
+  <div>
+    <h4 class="fw-bold mb-0" style="color:var(--text-primary);">
+      <i class="bi bi-arrow-repeat me-2" style="color:var(--brand-primary);"></i>Detected Subscriptions
+    </h4>
+    <p class="text-muted mb-0" style="font-size:0.88rem;">Recurring payments found in the last 3 months.</p>
+  </div>
+</div>
+
 {% if subscriptions %}
-    <table class="table table-striped">
+<div class="card mb-4 fade-in">
+  <div class="card-header"><i class="bi bi-list-ul"></i> All Recurring Payments</div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
         <thead>
-            <tr>
-                <th>Category</th>
-                <th>Description</th>
-                <th>Avg. Monthly Amount</th>
-                <th>Occurrences</th>
-                <th>Last Date</th>
-            </tr>
+          <tr>
+            <th>Service / Category</th>
+            <th>Description</th>
+            <th>Avg. Monthly</th>
+            <th>Occurrences</th>
+            <th>Last Seen</th>
+          </tr>
         </thead>
         <tbody>
         {% for sub in subscriptions %}
-            <tr>
-                <td>{{ sub.category }}</td>
-                <td>{{ sub.description }}</td>
-                <td>${{ "%.2f"|format(sub.avg_amount) }}</td>
-                <td>{{ sub.frequency }} times</td>
-                <td>{{ sub.last_date.strftime('%Y-%m-%d') }}</td>
-            </tr>
+        <tr>
+          <td>
+            {% if 'netflix' in sub.category.lower() or 'streaming' in sub.category.lower() %}📺
+            {% elif 'spotify' in sub.category.lower() or 'music' in sub.category.lower() %}🎵
+            {% elif 'gym' in sub.category.lower() or 'fitness' in sub.category.lower() %}💪
+            {% elif 'insurance' in sub.category.lower() %}🛡️
+            {% elif 'rent' in sub.category.lower() %}🏠
+            {% elif 'internet' in sub.category.lower() or 'phone' in sub.category.lower() %}📡
+            {% else %}🔄{% endif %}
+            <strong>{{ sub.category }}</strong>
+          </td>
+          <td style="font-size:0.88rem;color:var(--text-muted);">{{ sub.description or '—' }}</td>
+          <td><span class="badge bg-primary">₹{{ "%.0f"|format(sub.avg_amount) }}</span></td>
+          <td><span class="badge bg-info">{{ sub.frequency }}x</span></td>
+          <td style="font-size:0.85rem;">{{ sub.last_date.strftime('%d %b %Y') }}</td>
+        </tr>
         {% endfor %}
         </tbody>
-    </table>
-    <p><strong>Total monthly subscription cost: ${{ "%.2f"|format(total_cost) }}</strong></p>
-    <div class="alert alert-info">
-        💡 Tip: Review these recurring expenses. Canceling even small subscriptions can add up to significant savings.
+      </table>
     </div>
+  </div>
+</div>
+
+<div class="row g-3 fade-in fade-in-delay-1">
+  <div class="col-md-5">
+    <div class="stat-card stat-expense" style="height:100%;">
+      <div class="stat-icon"><i class="bi bi-receipt"></i></div>
+      <div class="stat-label">Total Monthly Cost</div>
+      <div class="stat-value">₹{{ "%.0f"|format(total_cost) }}</div>
+      <div class="stat-sub">Across {{ subscriptions|length }} subscription{% if subscriptions|length != 1 %}s{% endif %}</div>
+      <div class="stat-bg-icon"><i class="bi bi-arrow-repeat"></i></div>
+    </div>
+  </div>
+  <div class="col-md-7">
+    <div class="alert alert-info h-100 d-flex align-items-start gap-3 mb-0" style="border-radius:var(--radius-md);">
+      <i class="bi bi-lightbulb-fill" style="font-size:1.5rem;flex-shrink:0;margin-top:2px;"></i>
+      <div>
+        <strong>Money-saving tip</strong>
+        <p class="mb-0 mt-1" style="font-size:0.9rem;">Review these recurring expenses regularly. Canceling even one unused subscription can save you
+        <strong>₹{{ "%.0f"|format(total_cost) }}</strong> per month — that's <strong>₹{{ "%.0f"|format(total_cost * 12) }}</strong> a year!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% else %}
-    <p>No recurring subscriptions detected in the last 3 months.</p>
+<div class="card fade-in">
+  <div class="card-body text-center py-5">
+    <div style="font-size:4rem;margin-bottom:1rem;opacity:0.4;">🔄</div>
+    <h4 class="mb-2">No Subscriptions Detected</h4>
+    <p class="text-muted mb-4">No recurring payments were found in the last 3 months. Mark expenses as subscriptions when adding them.</p>
+    <a href="{{ url_for('add_expense') }}" class="btn btn-primary">
+      <i class="bi bi-plus-circle me-2"></i>Add an Expense
+    </a>
+  </div>
+</div>
 {% endif %}
+
 {% endblock %}

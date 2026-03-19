@@ -1,438 +1,385 @@
 {% extends "base.html" %}
 {% block content %}
 
-<!-- Welcome Message -->
-<div class="mb-4">
-    <h4 class="text-dark mt-2 mb-4">
-👋 Welcome back, {{ current_user.username }}!
-</h4>
+<div class="d-flex align-items-center justify-content-between mb-4 fade-in">
+  <div>
+    <h4 class="mb-0 fw-bold" style="color: var(--text-primary);">
+      <i class="bi bi-hand-wave me-2" style="color: var(--brand-primary);"></i>Welcome back, <span style="color: var(--brand-primary);">{{ current_user.username }}</span>!
+    </h4>
+    <p class="text-muted mb-0" style="font-size:0.88rem;">Here's your financial snapshot for this month.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('add_income') }}" class="btn btn-success btn-sm"><i class="bi bi-plus me-1"></i>Income</a>
+    <a href="{{ url_for('add_expense') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus me-1"></i>Expense</a>
+  </div>
 </div>
 
-<!-- Summary Cards -->
-<div class="row g-4 mb-4 fade-in">
-    <div class="col-md-4">
-        <div class="card text-white bg-primary h-100">
-            <div class="card-header"> Total Income</div>
-            <div class="card-body">
-                <h5 class="card-title">₹{{ "%.2f"|format(total_income) }}</h5>
-                <p class="card-text">This month</p>
-            </div>
-        </div>
+<!-- Stat Cards -->
+<div class="row g-3 mb-4 fade-in fade-in-delay-1">
+  <div class="col-6 col-lg-3">
+    <div class="stat-card stat-income">
+      <div class="stat-icon"><i class="bi bi-cash-coin"></i></div>
+      <div class="stat-label">Total Income</div>
+      <div class="stat-value">₹{{ "%.0f"|format(total_income) }}</div>
+      <div class="stat-sub">This month</div>
+      <div class="stat-bg-icon"><i class="bi bi-cash-stack"></i></div>
     </div>
-    <div class="col-md-4">
-        <div class="card text-white bg-danger h-100">
-            <div class="card-header"> Total Spent</div>
-            <div class="card-body">
-                <h5 class="card-title">₹{{ "%.2f"|format(total_spent) }}</h5>
-                <p class="card-text">This month</p>
-            </div>
-        </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card stat-expense">
+      <div class="stat-icon"><i class="bi bi-credit-card"></i></div>
+      <div class="stat-label">Total Spent</div>
+      <div class="stat-value">₹{{ "%.0f"|format(total_spent) }}</div>
+      <div class="stat-sub">This month</div>
+      <div class="stat-bg-icon"><i class="bi bi-wallet2"></i></div>
     </div>
-    <div class="col-md-4">
-        <div class="card text-white bg-warning h-100">
-            <div class="card-header"> Burn Rate</div>
-            <div class="card-body">
-                <h5 class="card-title">₹{{ "%.2f"|format(burn_rate) }}/day</h5>
-                <p class="card-text">Average daily spending</p>
-            </div>
-        </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card stat-balance">
+      <div class="stat-icon"><i class="bi bi-bank"></i></div>
+      <div class="stat-label">Net Balance</div>
+      <div class="stat-value">₹{{ "%.0f"|format(total_income - total_spent) }}</div>
+      <div class="stat-sub">Income - Expenses</div>
+      <div class="stat-bg-icon"><i class="bi bi-bar-chart"></i></div>
     </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card stat-burn">
+      <div class="stat-icon"><i class="bi bi-fire"></i></div>
+      <div class="stat-label">Burn Rate</div>
+      <div class="stat-value">₹{{ "%.0f"|format(burn_rate) }}</div>
+      <div class="stat-sub">Per day average</div>
+      <div class="stat-bg-icon"><i class="bi bi-graph-up-arrow"></i></div>
+    </div>
+  </div>
 </div>
 
 <!-- Income Sources & Needs vs Wants -->
-<div class="row g-4  fade-in">
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header"> Income Sources</div>
-            <div class="card-body">
-                <ul class="list-group list-group-flush">
-                {% for src, amt in source_breakdown.items() %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>
-                            {% if src == 'salary' %}
-                            {% elif src == 'business' %}
-                            {% elif src == 'freelance' %}
-                            {% elif src == 'allowance' %}
-                            {% else %}{% endif %}
-                            {{ src|capitalize }}
-                        </span>
-                        <span class="badge bg-primary rounded-pill">
-                            ₹{{ "%.2f"|format(amt) }} ({{ "%.1f"|format(source_percentages[src]) }}%)
-                        </span>
-                    </li>
-                {% else %}
-                    <li class="list-group-item">No income recorded this month.</li>
-                {% endfor %}
-                </ul>
-            </div>
-        </div>
+<div class="row g-3 mb-4 fade-in fade-in-delay-2">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-cash-coin"></i> Income Sources</div>
+      <div class="card-body p-0">
+        <ul class="list-group list-group-flush px-3">
+          {% for src, amt in source_breakdown.items() %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span class="d-flex align-items-center gap-2">
+              {% if src == 'salary' %}<i class="bi bi-briefcase-fill text-primary"></i>
+              {% elif src == 'business' %}<i class="bi bi-building text-success"></i>
+              {% elif src == 'freelance' %}<i class="bi bi-laptop text-info"></i>
+              {% elif src == 'allowance' %}<i class="bi bi-gift text-warning"></i>
+              {% else %}<i class="bi bi-coin text-secondary"></i>{% endif %}
+              {{ src|capitalize }}
+            </span>
+            <span class="badge bg-primary">₹{{ "%.0f"|format(amt) }} &middot; {{ "%.1f"|format(source_percentages[src]) }}%</span>
+          </li>
+          {% else %}
+          <li class="list-group-item text-muted">No income recorded this month. <a href="{{ url_for('add_income') }}">Add income</a></li>
+          {% endfor %}
+        </ul>
+      </div>
     </div>
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header"> Needs vs Wants</div>
-            <div class="card-body">
-                <p><strong>Essential:</strong> ₹{{ "%.2f"|format(essential) }} ({{ "%.1f"|format(needs_pct) }}%)</p>
-                <p><strong>Non‑Essential:</strong> ₹{{ "%.2f"|format(non_essential) }} ({{ "%.1f"|format(wants_pct) }}%)</p>
-                <div class="progress mb-3" style="height: 25px;">
-                    <div class="progress-bar bg-success" style="width: {{ needs_pct }}%;" role="progressbar">Needs</div>
-                    <div class="progress-bar bg-warning" style="width: {{ wants_pct }}%;" role="progressbar">Wants</div>
-                </div>
-                {% if wants_alert %}
-                <div class="alert alert-warning mt-3">
-                     Warning: Wants exceed 50% of total expenses. Consider reducing:
-                    <ul class="mb-0 mt-2">
-                        <li>Dining out</li>
-                        <li>Entertainment subscriptions</li>
-                        <li>Shopping</li>
-                    </ul>
-                </div>
-                {% endif %}
-            </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-toggles"></i> Needs vs Wants</div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-2">
+          <span><span class="badge bg-success me-1">Needs</span> ₹{{ "%.0f"|format(essential) }}</span>
+          <span><span class="badge bg-warning me-1">Wants</span> ₹{{ "%.0f"|format(non_essential) }}</span>
         </div>
+        <div class="progress mb-3" style="height:20px;">
+          <div class="progress-bar bg-success" style="width:{{ needs_pct }}%;" title="Needs {{ "%.1f"|format(needs_pct) }}%">{{ "%.0f"|format(needs_pct) }}%</div>
+          <div class="progress-bar bg-warning" style="width:{{ wants_pct }}%;" title="Wants {{ "%.1f"|format(wants_pct) }}%">{{ "%.0f"|format(wants_pct) }}%</div>
+        </div>
+        <div class="row g-2 mb-2">
+          <div class="col-6">
+            <div class="p-2 rounded text-center" style="background:rgba(0,184,148,0.1);">
+              <div style="font-size:0.78rem;color:#00b894;font-weight:700;text-transform:uppercase;">Essential</div>
+              <div style="font-weight:700;">{{ "%.1f"|format(needs_pct) }}%</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-2 rounded text-center" style="background:rgba(243,156,18,0.1);">
+              <div style="font-size:0.78rem;color:#f39c12;font-weight:700;text-transform:uppercase;">Non-Essential</div>
+              <div style="font-weight:700;">{{ "%.1f"|format(wants_pct) }}%</div>
+            </div>
+          </div>
+        </div>
+        {% if wants_alert %}
+        <div class="alert alert-warning mt-2 py-2">
+          <i class="bi bi-exclamation-triangle-fill me-1"></i>
+          <strong>Heads up!</strong> Wants exceed 50% of spending. Consider cutting dining out, entertainment, or shopping.
+        </div>
+        {% endif %}
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Category Breakdown & Subscriptions -->
-<div class="row g-4 mb-4 fade-in">
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header">📂 Category Breakdown</div>
-            <div class="card-body">
-                <ul class="list-group list-group-flush">
-                    {% for cat, amt in categories.items() %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>
-                                {% if 'rent' in cat.lower() or 'mortgage' in cat.lower() %}🏠
-                                {% elif 'food' in cat.lower() or 'groceries' in cat.lower() %}🍔
-                                {% elif 'transport' in cat.lower() or 'fuel' in cat.lower() %}🚗
-                                {% elif 'electricity' in cat.lower() or 'water' in cat.lower() or 'gas' in cat.lower() %}⚡
-                                {% elif 'health' in cat.lower() or 'medical' in cat.lower() %}🏥
-                                {% elif 'education' in cat.lower() or 'school' in cat.lower() %}📚
-                                {% elif 'insurance' in cat.lower() %}🛡️
-                                {% elif 'entertainment' in cat.lower() %}🎮
-                                {% elif 'travel' in cat.lower() %}✈️
-                                {% else %}📌{% endif %}
-                                {{ cat }}
-                            </span>
-                            <span class="badge bg-primary rounded-pill">₹{{ "%.2f"|format(amt) }}</span>
-                        </li>
-                    {% else %}
-                        <li class="list-group-item">No expenses this month.</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
+<div class="row g-3 mb-4 fade-in fade-in-delay-3">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-grid-3x3-gap"></i> Category Breakdown</div>
+      <div class="card-body p-0">
+        <ul class="list-group list-group-flush px-3">
+          {% for cat, amt in categories.items() %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>
+              {% if 'rent' in cat.lower() or 'mortgage' in cat.lower() %}🏠
+              {% elif 'food' in cat.lower() or 'groceries' in cat.lower() %}🍔
+              {% elif 'transport' in cat.lower() or 'fuel' in cat.lower() %}🚗
+              {% elif 'electricity' in cat.lower() or 'water' in cat.lower() or 'gas' in cat.lower() %}⚡
+              {% elif 'health' in cat.lower() or 'medical' in cat.lower() %}🏥
+              {% elif 'education' in cat.lower() or 'school' in cat.lower() %}📚
+              {% elif 'insurance' in cat.lower() %}🛡️
+              {% elif 'entertainment' in cat.lower() %}🎮
+              {% elif 'travel' in cat.lower() %}✈️
+              {% else %}📌{% endif %}
+              {{ cat }}
+            </span>
+            <span class="badge bg-primary">₹{{ "%.0f"|format(amt) }}</span>
+          </li>
+          {% else %}
+          <li class="list-group-item text-muted">No expenses this month.</li>
+          {% endfor %}
+        </ul>
+      </div>
     </div>
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header">🔁 Detected Subscriptions</div>
-            <div class="card-body">
-                {% if subscriptions %}
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Category</th>
-                                    <th>Avg. Amount</th>
-                                    <th>Frequency</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            {% for sub in subscriptions[:5] %}
-                                <tr>
-                                    <td>
-                                        {% if 'netflix' in sub.category or 'streaming' in sub.category %}📺
-                                        {% elif 'spotify' in sub.category or 'music' in sub.category %}🎵
-                                        {% elif 'gym' in sub.category %}💪
-                                        {% else %}🔄{% endif %}
-                                        {{ sub.category }}
-                                    </td>
-                                    <td>₹{{ "%.2f"|format(sub.avg_amount) }}</td>
-                                    <td>{{ sub.frequency }}x</td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    <p class="mb-2"><strong>Total monthly:</strong> ₹{{ "%.2f"|format(total_sub_cost) }}</p>
-                    <a href="{{ url_for('subscriptions') }}" class="btn btn-info btn-sm">View All Subscriptions</a>
-                {% else %}
-                    <p>No recurring subscriptions detected in the last 3 months.</p>
-                {% endif %}
-            </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-arrow-repeat"></i> Detected Subscriptions</div>
+      <div class="card-body">
+        {% if subscriptions %}
+        <div class="table-wrapper">
+          <table class="table table-hover">
+            <thead><tr><th>Service</th><th>Avg. Amount</th><th>Freq.</th></tr></thead>
+            <tbody>
+            {% for sub in subscriptions[:5] %}
+            <tr>
+              <td>
+                {% if 'netflix' in sub.category.lower() or 'streaming' in sub.category.lower() %}📺
+                {% elif 'spotify' in sub.category.lower() or 'music' in sub.category.lower() %}🎵
+                {% elif 'gym' in sub.category.lower() %}💪
+                {% else %}🔄{% endif %}
+                {{ sub.category }}
+              </td>
+              <td>₹{{ "%.0f"|format(sub.avg_amount) }}</td>
+              <td><span class="badge bg-info">{{ sub.frequency }}x</span></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
         </div>
+        <div class="d-flex justify-content-between align-items-center mt-2">
+          <strong style="font-size:0.9rem;">Total: ₹{{ "%.0f"|format(total_sub_cost) }}/mo</strong>
+          <a href="{{ url_for('subscriptions') }}" class="btn btn-info btn-sm">View All</a>
+        </div>
+        {% else %}
+        <div class="text-center py-4 text-muted">
+          <i class="bi bi-arrow-repeat" style="font-size:2.5rem;opacity:0.3;"></i>
+          <p class="mt-2 mb-0">No recurring subscriptions detected.</p>
+        </div>
+        {% endif %}
+      </div>
     </div>
+  </div>
 </div>
 
-<!-- Recent Incomes -->
-<div class="card mb-4 ">
-    <div class="card-header">📥 Recent Incomes</div>
-    <div class="card-body">
+<!-- Recent Transactions -->
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-arrow-down-circle"></i> Recent Income</div>
+      <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Source</th>
-                        <th>Amount</th>
-                        <th>Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for inc in recent_incomes %}
-                    <tr>
-                        <td>
-                            {% if inc.source == 'salary' %}💼
-                            {% elif inc.source == 'business' %}🏢
-                            {% elif inc.source == 'freelance' %}💻
-                            {% elif inc.source == 'allowance' %}🎁
-                            {% else %}💰{% endif %}
-                            {{ inc.source }}
-                        </td>
-                        <td>₹{{ "%.2f"|format(inc.amount) }}</td>
-                        <td>{{ inc.date_received.strftime('%Y-%m-%d') }}</td>
-                        <td>
-                            <a href="{{ url_for('edit_income', id=inc.id) }}" class="btn btn-primary btn-sm">Edit</a>
-                            <a href="{{ url_for('delete_income', id=inc.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this income?')">Delete</a>
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr><td colspan="4" class="text-center">No incomes recorded yet. <a href="{{ url_for('add_income') }}">Add your first income</a></td></tr>
-                {% endfor %}
-                </tbody>
-            </table>
+          <table class="table table-hover">
+            <thead><tr><th>Source</th><th>Amount</th><th>Date</th><th></th></tr></thead>
+            <tbody>
+            {% for inc in recent_incomes %}
+            <tr>
+              <td>
+                {% if inc.source == 'salary' %}💼{% elif inc.source == 'business' %}🏢
+                {% elif inc.source == 'freelance' %}💻{% elif inc.source == 'allowance' %}🎁
+                {% else %}💰{% endif %}
+                {{ inc.source|capitalize }}
+              </td>
+              <td><strong class="text-success">₹{{ "%.0f"|format(inc.amount) }}</strong></td>
+              <td style="font-size:0.82rem;color:var(--text-muted);">{{ inc.date_received.strftime('%d %b') }}</td>
+              <td>
+                <a href="{{ url_for('edit_income', id=inc.id) }}" class="btn btn-primary btn-sm">Edit</a>
+                <a href="{{ url_for('delete_income', id=inc.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Delete this income?')">Del</a>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-center text-muted py-3">No income yet. <a href="{{ url_for('add_income') }}">Add one</a></td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
         </div>
+      </div>
     </div>
-</div>
-
-<!-- Recent Expenses -->
-<div class="card mb-4">
-    <div class="card-header">📤 Recent Expenses</div>
-    <div class="card-body">
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-arrow-up-circle"></i> Recent Expenses</div>
+      <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Category</th>
-                        <th>Amount</th>
-                        <th>Date</th>
-                        <th>Type</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for exp in recent_expenses %}
-                    <tr>
-                        <td>
-                            {% if 'rent' in exp.category.lower() or 'mortgage' in exp.category.lower() %}🏠
-                            {% elif 'food' in exp.category.lower() or 'groceries' in exp.category.lower() %}🍔
-                            {% elif 'transport' in exp.category.lower() or 'fuel' in exp.category.lower() %}🚗
-                            {% elif 'electricity' in exp.category.lower() or 'water' in exp.category.lower() or 'gas' in exp.category.lower() %}⚡
-                            {% elif 'health' in exp.category.lower() or 'medical' in exp.category.lower() %}🏥
-                            {% elif 'education' in exp.category.lower() or 'school' in exp.category.lower() %}📚
-                            {% elif 'insurance' in exp.category.lower() %}🛡️
-                            {% elif 'entertainment' in exp.category.lower() %}🎮
-                            {% elif 'travel' in exp.category.lower() %}✈️
-                            {% else %}📌{% endif %}
-                            {{ exp.category }}
-                        </td>
-                        <td>₹{{ "%.2f"|format(exp.amount) }}</td>
-                        <td>{{ exp.date.strftime('%Y-%m-%d') }}</td>
-                        <td>
-                            <span class="badge {% if exp.is_essential %}bg-success{% else %}bg-warning{% endif %}">
-                                {% if exp.is_essential %}Need{% else %}Want{% endif %}
-                            </span>
-                        </td>
-                        <td>
-                            <a href="{{ url_for('edit_expense', id=exp.id) }}" class="btn btn-primary btn-sm">Edit</a>
-                            <a href="{{ url_for('delete_expense', id=exp.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this expense?')">Delete</a>
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr><td colspan="5" class="text-center">No expenses recorded yet. <a href="{{ url_for('add_expense') }}">Add your first expense</a></td></tr>
-                {% endfor %}
-                </tbody>
-            </table>
+          <table class="table table-hover">
+            <thead><tr><th>Category</th><th>Amount</th><th>Type</th><th></th></tr></thead>
+            <tbody>
+            {% for exp in recent_expenses %}
+            <tr>
+              <td>
+                {% if 'rent' in exp.category.lower() or 'mortgage' in exp.category.lower() %}🏠
+                {% elif 'food' in exp.category.lower() or 'groceries' in exp.category.lower() %}🍔
+                {% elif 'transport' in exp.category.lower() %}🚗
+                {% elif 'health' in exp.category.lower() %}🏥
+                {% elif 'entertainment' in exp.category.lower() %}🎮
+                {% else %}📌{% endif %}
+                {{ exp.category }}
+              </td>
+              <td><strong class="text-danger">₹{{ "%.0f"|format(exp.amount) }}</strong></td>
+              <td>
+                <span class="badge {% if exp.is_essential %}bg-success{% else %}bg-warning{% endif %}">
+                  {% if exp.is_essential %}Need{% else %}Want{% endif %}
+                </span>
+              </td>
+              <td>
+                <a href="{{ url_for('edit_expense', id=exp.id) }}" class="btn btn-primary btn-sm">Edit</a>
+                <a href="{{ url_for('delete_expense', id=exp.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Delete this expense?')">Del</a>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-center text-muted py-3">No expenses yet. <a href="{{ url_for('add_expense') }}">Add one</a></td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
         </div>
+      </div>
     </div>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="row g-3 mb-4">
+  <div class="col-md-5">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-pie-chart"></i> Expense Distribution</div>
+      <div class="card-body d-flex align-items-center justify-content-center" style="min-height:280px;">
+        <canvas id="expenseChart" style="max-height:260px;"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-7">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-graph-up"></i> Monthly Spending Trend</div>
+      <div class="card-body" style="min-height:280px;">
+        <canvas id="trendChart" style="max-height:260px;"></canvas>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="card mb-4">
-    <div class="card-header">📊 Expense Distribution</div>
-    <div class="card-body">
-        <canvas id="expenseChart"></canvas>
-    </div>
+  <div class="card-header"><i class="bi bi-bar-chart-line"></i> Income vs Expense</div>
+  <div class="card-body" style="max-height:260px;">
+    <canvas id="incomeExpenseChart" style="max-height:240px;"></canvas>
+  </div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
 <script>
-const centerTextPlugin = {
-    id: 'centerText',
-    beforeDraw: function(chart) {
-        const width = chart.width;
-        const height = chart.height;
-        const ctx = chart.ctx;
-
-        ctx.restore();
-        ctx.font = "bold 18px sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillStyle = "#333";
-
-        ctx.fillText("Expenses", width / 2, height / 2);
-        ctx.save();
-    }
+const chartDefaults = {
+  font: { family: "'Segoe UI', system-ui, sans-serif" }
 };
-</script>
 
-<script>    
+// Expense Distribution Donut
 const ctx = document.getElementById('expenseChart');
-
 new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-        labels: {{ categories.keys()|list|tojson }},
-        datasets: [{
-            data: {{ categories.values()|list|tojson }},
-            backgroundColor: [
-                '#6C5CE7',
-                '#00CEC9',
-                '#FD79A8',
-                '#FDCB6E',
-                '#55EFC4',
-                '#E17055',
-                '#0984E3'
-            ],
-            borderWidth: 2,
-            borderColor: '#ffffff'
-        }]
-    },
-    options: {
-        responsive: true,
-        cutout: '65%',  // makes it modern donut
-        animation: {
-            animateScale: true,
-            animateRotate: true
-        },
-        plugins: {
-            legend: {
-                position: 'bottom',
-                labels: {
-                    padding: 20,
-                    font: {
-                        size: 13
-                    }
-                }
-            },
-            tooltip: {
-                callbacks: {
-                    label: function(context) {
-                        return context.label + ": ₹" + context.raw;
-                    }
-                }
-            }
-        }
+  type: 'doughnut',
+  data: {
+    labels: {{ categories.keys()|list|tojson }},
+    datasets: [{
+      data: {{ categories.values()|list|tojson }},
+      backgroundColor: ['#6C5CE7','#00CEC9','#FD79A8','#FDCB6E','#55EFC4','#E17055','#0984E3','#A29BFE','#00B894'],
+      borderWidth: 3,
+      borderColor: '#fff',
+      hoverOffset: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    cutout: '68%',
+    animation: { animateScale: true, animateRotate: true },
+    plugins: {
+      legend: { position: 'bottom', labels: { padding: 16, font: { size: 12 }, usePointStyle: true } },
+      tooltip: { callbacks: { label: ctx => ctx.label + ': ₹' + ctx.raw } }
     }
+  }
 });
-</script>
 
-<div class="card mb-4">
-    <div class="card-header">📈 Monthly Spending Trend</div>
-    <div class="card-body">
-        <canvas id="trendChart"></canvas>
-    </div>
-</div>
-
-<script>
+// Monthly Spending Trend
 const trendCtx = document.getElementById('trendChart');
-
 new Chart(trendCtx, {
-    type: 'line',
-    data: {
-        labels: {{ monthly_spending.keys()|list|tojson }},
-        datasets: [{
-            label: "Monthly Spending",
-            data: {{ monthly_spending.values()|list|tojson }},
-            borderColor: '#6C5CE7',
-            backgroundColor: 'rgba(108,92,231,0.1)',
-            fill: true,
-            tension: 0.4,
-            pointRadius: 5,
-            pointHoverRadius: 7
-        }]
+  type: 'line',
+  data: {
+    labels: {{ monthly_spending.keys()|list|tojson }},
+    datasets: [{
+      label: 'Monthly Spending',
+      data: {{ monthly_spending.values()|list|tojson }},
+      borderColor: '#6C5CE7',
+      backgroundColor: 'rgba(108,92,231,0.1)',
+      fill: true,
+      tension: 0.45,
+      pointRadius: 5,
+      pointBackgroundColor: '#6C5CE7',
+      pointHoverRadius: 8
+    }]
+  },
+  options: {
+    responsive: true,
+    animation: { duration: 1200 },
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => '₹' + ctx.raw } }
     },
-    options: {
-        responsive: true,
-        animation: {
-            duration: 1200
-        },
-        plugins: {
-            legend: {
-                display: true
-            },
-            tooltip: {
-                callbacks: {
-                    label: function(context) {
-                        return "₹" + context.raw;
-                    }
-                }
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
+    scales: {
+      y: { beginAtZero: true, grid: { color: 'rgba(108,92,231,0.07)' }, ticks: { font: { size: 11 } } },
+      x: { grid: { display: false }, ticks: { font: { size: 11 } } }
     }
+  }
 });
-</script>
 
-<div class="card mb-4">
-    <div class="card-header">💰 Income vs Expense</div>
-    <div class="card-body">
-        <canvas id="incomeExpenseChart"></canvas>
-    </div>
-</div>
-
-<script>
+// Income vs Expense Bar
 const ieCtx = document.getElementById('incomeExpenseChart');
-
 new Chart(ieCtx, {
-    type: 'bar',
-    data: {
-        labels: ['Income', 'Expense'],
-        datasets: [{
-            label: 'Amount (₹)',
-            data: [
-                {{ total_income }},
-                {{ total_spent }}
-            ],
-            backgroundColor: [
-                '#00b894',   // green for income
-                '#d63031'    // red for expense
-            ],
-            borderRadius: 10
-        }]
+  type: 'bar',
+  data: {
+    labels: ['Income', 'Expense'],
+    datasets: [{
+      label: 'Amount (₹)',
+      data: [{{ total_income }}, {{ total_spent }}],
+      backgroundColor: ['rgba(0,184,148,0.85)', 'rgba(214,48,49,0.85)'],
+      borderRadius: 12,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => '₹' + ctx.raw } }
     },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                display: false
-            },
-            tooltip: {
-                callbacks: {
-                    label: function(context) {
-                        return "₹" + context.raw;
-                    }
-                }
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
+    scales: {
+      y: { beginAtZero: true, grid: { color: 'rgba(108,92,231,0.07)' }, ticks: { font: { size: 11 } } },
+      x: { grid: { display: false }, ticks: { font: { size: 12, weight: '600' } } }
     }
+  }
 });
 </script>
 {% endblock %}

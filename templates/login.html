@@ -1,94 +1,140 @@
 {% extends "base.html" %}
-
 {% block content %}
 
 <style>
-
-.login-container{
-    min-height:80vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+.auth-wrap {
+  min-height: 75vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.login-card{
-    width:100%;
-    max-width:420px;
-    border:none;
-    border-radius:18px;
-    padding:35px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.15);
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(108, 92, 231, 0.2);
+  border: none;
 }
 
-.login-title{
-    font-weight:600;
-    text-align:center;
-    margin-bottom:25px;
+.auth-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2.5rem 2rem 2rem;
+  text-align: center;
 }
 
-.form-control{
-    border-radius:10px;
+.auth-header .auth-icon {
+  width: 68px;
+  height: 68px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  margin: 0 auto 1rem;
+  backdrop-filter: blur(10px);
 }
 
-.btn-login{
-    width:100%;
-    border-radius:25px;
-    padding:10px;
-    font-weight:500;
+.auth-header h3 {
+  font-weight: 700;
+  margin: 0 0 4px;
+  font-size: 1.5rem;
 }
 
-.login-icon{
-    font-size:40px;
-    text-align:center;
-    margin-bottom:10px;
+.auth-header p {
+  opacity: 0.8;
+  font-size: 0.9rem;
+  margin: 0;
 }
 
+.auth-body {
+  padding: 2rem;
+  background: white;
+}
+
+.dark-mode .auth-body {
+  background: #1a1d2e;
+}
+
+.btn-auth {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  transition: all 0.28s;
+  box-shadow: 0 6px 20px rgba(108, 92, 231, 0.3);
+}
+
+.btn-auth:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(108, 92, 231, 0.4);
+  color: white;
+}
+
+.auth-divider {
+  text-align: center;
+  font-size: 0.88rem;
+  color: #636e72;
+  margin-top: 1.25rem;
+}
+
+.auth-divider a {
+  color: #6C5CE7;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.auth-divider a:hover {
+  text-decoration: underline;
+}
 </style>
 
-<div class="login-container">
-
-<div class="card login-card">
-
-<h3 class="login-title">Welcome Back</h3>
-
-<form method="POST">
-
-{{ form.hidden_tag() }}
-
-<div class="mb-3">
-{{ form.username.label(class="form-label") }}
-<div class="input-group">
-<span class="input-group-text"><i class="bi bi-person"></i></span>
-{{ form.username(class="form-control", placeholder="Enter username") }}
-</div>
-</div>
-
-<div class="mb-3">
-{{ form.password.label(class="form-label") }}
-<div class="input-group">
-<span class="input-group-text"><i class="bi bi-lock"></i></span>
-{{ form.password(class="form-control", placeholder="Enter password") }}
-</div>
-</div>
-
-<button type="submit" class="btn btn-primary btn-login">
-<i class="bi bi-box-arrow-in-right"></i> Login
-</button>
-
-</form>
-
-<div class="text-center mt-3">
-
-<p class="mb-1">Don't have an account?</p>
-
-<a href="{{ url_for('register') }}" class="text-decoration-none fw-bold">
-Create Account
-</a>
-
-</div>
-
-</div>
-
+<div class="auth-wrap">
+  <div class="auth-card fade-in">
+    <div class="auth-header">
+      <div class="auth-icon"><i class="bi bi-person-fill"></i></div>
+      <h3>Welcome Back</h3>
+      <p>Sign in to your Money Mate account</p>
+    </div>
+    <div class="auth-body">
+      <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+          {{ form.username.label(class="form-label") }}
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-person"></i></span>
+            {{ form.username(class="form-control", placeholder="Enter your username") }}
+          </div>
+          {% if form.username.errors %}
+            {% for err in form.username.errors %}<small class="text-danger">{{ err }}</small>{% endfor %}
+          {% endif %}
+        </div>
+        <div class="mb-4">
+          {{ form.password.label(class="form-label") }}
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+            {{ form.password(class="form-control", placeholder="Enter your password") }}
+          </div>
+          {% if form.password.errors %}
+            {% for err in form.password.errors %}<small class="text-danger">{{ err }}</small>{% endfor %}
+          {% endif %}
+        </div>
+        <button type="submit" class="btn-auth">
+          <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+        </button>
+      </form>
+      <div class="auth-divider">
+        Don't have an account? <a href="{{ url_for('register') }}">Create one free</a>
+      </div>
+    </div>
+  </div>
 </div>
 
 {% endblock %}

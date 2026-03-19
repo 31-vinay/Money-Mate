@@ -1,100 +1,81 @@
 {% extends "base.html" %}
 {% block content %}
+
 <div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="mb-0">{% if edit %}✏️ Edit Expense{% else %}➕ Add New Expense{% endif %}</h4>
+  <div class="col-md-8 col-lg-7">
+    <div class="card fade-in">
+      <div class="card-header">
+        <i class="bi bi-{% if edit %}pencil{% else %}wallet2{% endif %}"></i>
+        {% if edit %}Edit Expense{% else %}Add New Expense{% endif %}
+      </div>
+      <div class="card-body p-4">
+        <form method="POST" id="expenseForm">
+          {{ form.hidden_tag() }}
+
+          <div class="mb-3">
+            {{ form.main_category.label(class="form-label") }}
+            {{ form.main_category(class="form-select", id="mainCategory") }}
+            {% if form.main_category.errors %}
+              {% for err in form.main_category.errors %}<small class="text-danger d-block mt-1">{{ err }}</small>{% endfor %}
+            {% endif %}
+          </div>
+
+          <div class="mb-3" id="subCategoryDiv" style="display:none;">
+            {{ form.sub_category.label(class="form-label") }}
+            {{ form.sub_category(class="form-select", id="subCategory") }}
+            <small class="text-muted">Select a specific sub-category</small>
+            {% if form.sub_category.errors %}
+              {% for err in form.sub_category.errors %}<small class="text-danger d-block mt-1">{{ err }}</small>{% endfor %}
+            {% endif %}
+          </div>
+
+          <div class="mb-3" id="customCategoryDiv" style="display:none;">
+            {{ form.custom_category.label(class="form-label") }}
+            {{ form.custom_category(class="form-control", id="customCategory", placeholder="Enter your own category name") }}
+            <small class="text-muted">Type a custom category name</small>
+          </div>
+
+          <div class="mb-3">
+            {{ form.amount.label(class="form-label") }}
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-currency-rupee"></i></span>
+              {{ form.amount(class="form-control", type="number", step="0.01", placeholder="0.00") }}
             </div>
-            <div class="card-body">
-               <form method="POST" id="expenseForm">
-    {{ form.hidden_tag() }}
-    
-    <!-- Main Category Dropdown -->
-    <div class="mb-3">
-        {{ form.main_category.label(class="form-label fw-bold") }}
-        {{ form.main_category(class="form-select", id="mainCategory") }}
-        {% if form.main_category.errors %}
-            <div class="text-danger">
-                {% for error in form.main_category.errors %}
-                    <small>{{ error }}</small>
-                {% endfor %}
+            {% if form.amount.errors %}
+              {% for err in form.amount.errors %}<small class="text-danger d-block mt-1">{{ err }}</small>{% endfor %}
+            {% endif %}
+          </div>
+
+          <div class="mb-3">
+            {{ form.description.label(class="form-label") }}
+            {{ form.description(class="form-control", rows="2", placeholder="Optional description...") }}
+          </div>
+
+          <div class="mb-4">
+            <div class="form-check p-3 rounded" style="background:rgba(108,92,231,0.05);border:1.5px solid var(--border-color);">
+              {{ form.is_subscription(class="form-check-input") }}
+              {{ form.is_subscription.label(class="form-check-label fw-600") }}
+              <div><small class="text-muted">Mark if this is a recurring monthly payment</small></div>
             </div>
-        {% endif %}
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-success btn-lg">
+              <i class="bi bi-check-circle me-2"></i>
+              {% if edit %}Update Expense{% else %}Add Expense{% endif %}
+            </button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left me-1"></i>Cancel
+            </a>
+          </div>
+          <input type="hidden" id="subcategoriesLoaded" value="false">
+        </form>
+      </div>
     </div>
-    
-    <!-- Sub Category Dropdown (hidden initially) -->
-    <div class="mb-3" id="subCategoryDiv" style="display: none;">
-        {{ form.sub_category.label(class="form-label fw-bold") }}
-        {{ form.sub_category(class="form-select", id="subCategory") }}
-        <small class="text-muted">Select a specific category</small>
-        {% if form.sub_category.errors %}
-            <div class="text-danger">
-                {% for error in form.sub_category.errors %}
-                    <small>{{ error }}</small>
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div>
-    
-    <!-- Custom Category Input (hidden initially) -->
-    <div class="mb-3" id="customCategoryDiv" style="display: none;">
-        {{ form.custom_category.label(class="form-label fw-bold") }}
-        {{ form.custom_category(class="form-control", id="customCategory", 
-                                placeholder="e.g., New Category Name") }}
-        <small class="text-muted">Enter your own category name</small>
-    </div>
-    
-    <!-- Amount -->
-    <div class="mb-3">
-        {{ form.amount.label(class="form-label fw-bold") }}
-        <div class="input-group">
-            <span class="input-group-text">$</span>
-            {{ form.amount(class="form-control", type="number", step="0.01", 
-                          placeholder="0.00") }}
-        </div>
-        {% if form.amount.errors %}
-            <div class="text-danger">
-                {% for error in form.amount.errors %}
-                    <small>{{ error }}</small>
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div>
-    
-    <!-- Description -->
-    <div class="mb-3">
-        {{ form.description.label(class="form-label fw-bold") }}
-        {{ form.description(class="form-control", rows="2", 
-                            placeholder="Optional description") }}
-    </div>
-    
-    <!-- Subscription Checkbox -->
-    <div class="mb-4">
-        <div class="form-check">
-            {{ form.is_subscription(class="form-check-input") }}
-            {{ form.is_subscription.label(class="form-check-label") }}
-        </div>
-        <small class="text-muted">Check if this is a recurring monthly payment</small>
-    </div>
-    
-    <!-- Submit Button -->
-    <div class="d-grid gap-2">
-        <button type="submit" class="btn btn-success btn-lg">
-            {% if edit %}✏️ Update Expense{% else %}➕ Add Expense{% endif %}
-        </button>
-        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
-    </div>
-    <input type="hidden" id="subcategoriesLoaded" value="false">
-</form>
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
 
-
 <script>
-    // In the fetch success callback, add:
 document.getElementById('subcategoriesLoaded').value = 'true';
 
 document.getElementById('mainCategory').addEventListener('change', function() {
@@ -103,14 +84,12 @@ document.getElementById('mainCategory').addEventListener('change', function() {
     const subCategorySelect = document.getElementById('subCategory');
     const customCategoryDiv = document.getElementById('customCategoryDiv');
     const customCategoryInput = document.getElementById('customCategory');
-    
+
     if (mainCat) {
-        // Fetch subcategories via AJAX
         fetch(`/get_subcategories/${mainCat}`)
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success' && data.subcategories) {
-                    // Clear and populate subcategory dropdown
                     subCategorySelect.innerHTML = '<option value="">-- Select Sub Category --</option>';
                     data.subcategories.forEach(cat => {
                         const option = document.createElement('option');
@@ -118,16 +97,12 @@ document.getElementById('mainCategory').addEventListener('change', function() {
                         option.textContent = cat;
                         subCategorySelect.appendChild(option);
                     });
-                    
-                    // Show subcategory dropdown
                     subCategoryDiv.style.display = 'block';
                     customCategoryDiv.style.display = 'none';
                     customCategoryInput.value = '';
                 }
             })
-            .catch(error => {
-                console.error('Error fetching subcategories:', error);
-            });
+            .catch(error => console.error('Error:', error));
     } else {
         subCategoryDiv.style.display = 'none';
         customCategoryDiv.style.display = 'none';
@@ -140,7 +115,7 @@ document.getElementById('subCategory').addEventListener('change', function() {
     const subCat = this.value;
     const customCategoryDiv = document.getElementById('customCategoryDiv');
     const customCategoryInput = document.getElementById('customCategory');
-    
+
     if (subCat === 'Other (User Input)') {
         customCategoryDiv.style.display = 'block';
         customCategoryInput.required = true;
@@ -151,33 +126,25 @@ document.getElementById('subCategory').addEventListener('change', function() {
     }
 });
 
-// Pre-select values if editing
 {% if edit %}
 document.addEventListener('DOMContentLoaded', function() {
     const mainCat = '{{ form.main_category.data }}';
     const subCat = '{{ form.sub_category.data }}';
     const customCat = '{{ form.custom_category.data }}';
-    
+
     if (mainCat) {
-        // Trigger change event to load subcategories
         const mainSelect = document.getElementById('mainCategory');
         mainSelect.value = mainCat;
-        
-        // Manually trigger the change event
         const event = new Event('change', { bubbles: true });
         mainSelect.dispatchEvent(event);
-        
-        // Set subcategory after a short delay to ensure options are loaded
+
         setTimeout(function() {
             const subSelect = document.getElementById('subCategory');
             if (subSelect) {
                 subSelect.value = subCat;
-                // Trigger change event for subcategory
                 const subEvent = new Event('change', { bubbles: true });
                 subSelect.dispatchEvent(subEvent);
             }
-            
-            // Set custom category if any
             if (customCat) {
                 document.getElementById('customCategory').value = customCat;
             }
