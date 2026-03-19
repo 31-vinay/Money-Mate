@@ -189,7 +189,7 @@
           <td><strong>₹{{ "%.0f"|format(milestone.amount) }}</strong></td>
           <td style="min-width:120px;">
             <div class="progress" style="height:8px;">
-              <div class="progress-bar bg-success" style="width:{{ (milestone.amount / goal.target_amount * 100)|min(100) }}%;"></div>
+              <div class="progress-bar bg-success" style="width:{{ [milestone.amount / goal.target_amount * 100, 100]|min }}%;"></div>
             </div>
           </td>
         </tr>
