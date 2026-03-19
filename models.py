@@ -9,6 +9,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
+    replit_sub = db.Column(db.String(100), unique=True, nullable=True)
     incomes = db.relationship('Income', backref='user', lazy=True)
     expenses = db.relationship('Expense', backref='user', lazy=True)
     goals = db.relationship('Goal', backref='user', lazy=True)
@@ -40,23 +41,23 @@ class Goal(db.Model):
     monthly_savings = db.Column(db.Float, default=0.0)
     target_date = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
+
     @property
     def remaining_amount(self):
         return max(0, self.target_amount - self.saved_amount)
-    
+
     @property
     def progress_percentage(self):
         if self.target_amount == 0:
             return 0
         return min(100, (self.saved_amount / self.target_amount) * 100)
-    
+
     @property
     def estimated_months(self):
         if self.monthly_savings <= 0:
             return float('inf')
         return self.remaining_amount / self.monthly_savings
-    
+
     @property
     def estimated_date(self):
         if self.estimated_months == float('inf'):

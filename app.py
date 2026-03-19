@@ -18,14 +18,18 @@ from forms import (
 from datetime import datetime, timedelta
 from sqlalchemy import func
 from collections import defaultdict
+from werkzeug.middleware.proxy_fix import ProxyFix
 import json
+import os
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 
 admin = Admin(app, name="Finance Manager")
-app.config["SECRET_KEY"] = "your-secret-key-change-in-production"
+app.config["SECRET_KEY"] = os.environ.get("SESSION_SECRET", "your-secret-key-change-in-production")
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///finance.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -73,9 +77,20 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-# Create tables (run once)
+# Register Replit Auth blueprint
+from replit_auth import make_replit_blueprint
+app.register_blueprint(make_replit_blueprint(), url_prefix="/auth")
+
+# Create tables and run any needed column migrations
 with app.app_context():
     db.create_all()
+    # Add replit_sub column to existing SQLite databases that predate this feature
+    try:
+        with db.engine.connect() as conn:
+            conn.execute(db.text("ALTER TABLE user ADD COLUMN replit_sub VARCHAR(100)"))
+            conn.commit()
+    except Exception:
+        pass  # Column already exists
 
 # Category hierarchy from ChatGPT
 expense_categories = {

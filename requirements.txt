@@ -5,3 +5,9 @@ flask-wtf
 flask-admin
 email-validator
 gunicorn
+flask-dance
+flask-login
+oauthlib
+pyjwt
+sqlalchemy
+wtforms
