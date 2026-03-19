@@ -201,32 +201,40 @@
 
 <div class="row g-4 fade-in fade-in-delay-1">
   <div class="col-sm-6 col-lg-3">
-    <div class="feature-card">
-      <div class="feature-icon purple"><i class="bi bi-wallet2"></i></div>
-      <div class="feature-title">Expense Tracking</div>
-      <p class="feature-desc">Categorise every spend with smart tags and stay within your budget effortlessly.</p>
-    </div>
+    <a href="{{ url_for('add_expense') }}" style="text-decoration:none;color:inherit;">
+      <div class="feature-card" style="cursor:pointer;">
+        <div class="feature-icon purple"><i class="bi bi-wallet2"></i></div>
+        <div class="feature-title">Expense Tracking</div>
+        <p class="feature-desc">Categorise every spend with smart tags and stay within your budget effortlessly.</p>
+      </div>
+    </a>
   </div>
   <div class="col-sm-6 col-lg-3">
-    <div class="feature-card">
-      <div class="feature-icon green"><i class="bi bi-bar-chart-line"></i></div>
-      <div class="feature-title">Financial Insights</div>
-      <p class="feature-desc">Visual charts and reports that help you make smarter money decisions.</p>
-    </div>
+    <a href="{{ url_for('analysis') }}" style="text-decoration:none;color:inherit;">
+      <div class="feature-card" style="cursor:pointer;">
+        <div class="feature-icon green"><i class="bi bi-bar-chart-line"></i></div>
+        <div class="feature-title">Financial Insights</div>
+        <p class="feature-desc">Visual charts and reports that help you make smarter money decisions.</p>
+      </div>
+    </a>
   </div>
   <div class="col-sm-6 col-lg-3">
-    <div class="feature-card">
-      <div class="feature-icon blue"><i class="bi bi-bullseye"></i></div>
-      <div class="feature-title">Savings Goals</div>
-      <p class="feature-desc">Set targets, track progress and stay motivated with milestone tracking.</p>
-    </div>
+    <a href="{{ url_for('goals') }}" style="text-decoration:none;color:inherit;">
+      <div class="feature-card" style="cursor:pointer;">
+        <div class="feature-icon blue"><i class="bi bi-bullseye"></i></div>
+        <div class="feature-title">Savings Goals</div>
+        <p class="feature-desc">Set targets, track progress and stay motivated with milestone tracking.</p>
+      </div>
+    </a>
   </div>
   <div class="col-sm-6 col-lg-3">
-    <div class="feature-card">
-      <div class="feature-icon orange"><i class="bi bi-arrow-repeat"></i></div>
-      <div class="feature-title">Subscription Manager</div>
-      <p class="feature-desc">Automatically detect recurring payments so nothing slips through the cracks.</p>
-    </div>
+    <a href="{{ url_for('subscriptions') }}" style="text-decoration:none;color:inherit;">
+      <div class="feature-card" style="cursor:pointer;">
+        <div class="feature-icon orange"><i class="bi bi-arrow-repeat"></i></div>
+        <div class="feature-title">Subscription Manager</div>
+        <p class="feature-desc">Automatically detect recurring payments so nothing slips through the cracks.</p>
+      </div>
+    </a>
   </div>
 </div>
 
