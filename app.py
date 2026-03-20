@@ -23,7 +23,7 @@ import json
 import os
 
 app = Flask(__name__)
-app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)  # type: ignore[assignment]
 
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
