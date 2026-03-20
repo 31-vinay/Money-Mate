@@ -63,12 +63,15 @@ def create_admin():
     # Check if admin already exists
     admin_user = User.query.filter_by(username="admin").first()
     if not admin_user:
+        admin_password = os.environ.get("ADMIN_PASSWORD")
+        if not admin_password:
+            return "ADMIN_PASSWORD environment variable is not set. Admin user not created.", 500
         admin_user = User(
-            username="admin", email="admin@example.com", password="admin123"
+            username="admin", email="admin@example.com", password=admin_password
         )
         db.session.add(admin_user)
         db.session.commit()
-        return "Admin user created! Username: admin, Password: admin123"
+        return "Admin user created! Username: admin"
     return "Admin user already exists"
 
 
