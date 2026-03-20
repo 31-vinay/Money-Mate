@@ -94,45 +94,6 @@
 .auth-divider a:hover {
   text-decoration: underline;
 }
-
-.btn-replit-auth {
-  width: 100%;
-  padding: 0.72rem 1rem;
-  border-radius: 50px;
-  font-size: 0.97rem;
-  font-weight: 700;
-  background: #F26207;
-  color: white;
-  border: none;
-  text-decoration: none;
-  transition: all 0.25s;
-  box-shadow: 0 4px 16px rgba(242,98,7,0.28);
-}
-.btn-replit-auth:hover {
-  background: #d9550a;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(242,98,7,0.38);
-}
-
-.or-divider {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  color: #aaa;
-  font-size: 0.82rem;
-}
-.or-divider::before,
-.or-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #e0e0e0;
-}
-.dark-mode .or-divider::before,
-.dark-mode .or-divider::after {
-  background: #333;
-}
 </style>
 
 <div class="auth-wrap">
@@ -143,18 +104,6 @@
       <p>Sign in to your Money Mate account</p>
     </div>
     <div class="auth-body">
-      <!-- Login with Replit -->
-      <a href="{{ url_for('replit_auth.login') }}" class="btn-replit-auth d-flex align-items-center justify-content-center gap-2 mb-3">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M3 3h8v6H3zM3 9h8v6H3zM3 15h8v6H3zM13 3h8v6h-8zM13 9h8v6h-8zM13 15h8v6h-8z"/>
-        </svg>
-        Continue with Replit
-      </a>
-
-      <div class="or-divider my-3">
-        <span>or sign in with username</span>
-      </div>
-
       <form method="POST">
         {{ form.hidden_tag() }}
         <div class="mb-3">

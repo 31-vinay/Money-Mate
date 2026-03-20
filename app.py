@@ -77,17 +77,13 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-# Register Replit Auth blueprint
-from replit_auth import make_replit_blueprint
-app.register_blueprint(make_replit_blueprint(), url_prefix="/auth")
-
 # Create tables and run any needed column migrations
 with app.app_context():
     db.create_all()
-    # Add replit_sub column to existing SQLite databases that predate this feature
+    # Add has_seen_tutorial column for existing databases
     try:
         with db.engine.connect() as conn:
-            conn.execute(db.text("ALTER TABLE user ADD COLUMN replit_sub VARCHAR(100)"))
+            conn.execute(db.text("ALTER TABLE user ADD COLUMN has_seen_tutorial BOOLEAN DEFAULT 0 NOT NULL"))
             conn.commit()
     except Exception:
         pass  # Column already exists
@@ -530,6 +526,8 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user and user.password == form.password.data:
             login_user(user)
+            if not user.has_seen_tutorial:
+                return redirect(url_for("tutorial"))
             return redirect(url_for("dashboard"))
         else:
             flash("Login failed. Check username and password.", "danger")
@@ -541,6 +539,20 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for("index"))
+
+
+@app.route("/tutorial")
+@login_required
+def tutorial():
+    return render_template("tutorial.html")
+
+
+@app.route("/complete_tutorial")
+@login_required
+def complete_tutorial():
+    current_user.has_seen_tutorial = True
+    db.session.commit()
+    return redirect(url_for("dashboard"))
 
 
 @app.route("/dashboard")

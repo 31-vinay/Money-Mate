@@ -9,7 +9,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
-    replit_sub = db.Column(db.String(100), unique=True, nullable=True)
+    has_seen_tutorial = db.Column(db.Boolean, default=False, nullable=False)
     incomes = db.relationship('Income', backref='user', lazy=True)
     expenses = db.relationship('Expense', backref='user', lazy=True)
     goals = db.relationship('Goal', backref='user', lazy=True)
